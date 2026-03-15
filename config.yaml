@@ -1,0 +1,9 @@
+# kira-cluade-code 配置文件
+name: kira-cluade-code
+version: 0.1.0
+description: Kira 的 Claude Code 技能集合
+
+skills:
+  - name: business-tracker
+    path: skills/business-tracker
+    description: 项目业务模块追踪、扫描与查询

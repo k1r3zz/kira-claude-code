@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "kira-cluade-code",
+  "name": "kira-claude-code",
   "owner": {
     "name": "k1r3zz"
   },

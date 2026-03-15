@@ -1,11 +1,11 @@
-# kira-cluade-code
+# kira-claude-code
 
 Kira 的 Claude Code 技能集合，用于增强 AI Agent 的能力。
 
 ## Install
 
 ```bash
-/plugin marketplace add https://github.com/k1r3zz/kira-cluade-code
+/plugin marketplace add https://github.com/k1r3zz/kira-claude-code
 /plugin install business-tracker
 ```
 

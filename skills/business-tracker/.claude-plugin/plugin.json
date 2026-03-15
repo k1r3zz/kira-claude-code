@@ -1,0 +1,4 @@
+{
+  "name": "business-tracker",
+  "description": "自动提取、追踪代码库中的业务逻辑，生成活文档"
+}

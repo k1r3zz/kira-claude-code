@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "kira-cluade-code",
+  "owner": {
+    "name": "k1r3zz"
+  },
+  "metadata": {
+    "description": "Kira Claude Code - Skills collection",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "business-tracker",
+      "version": "1.0.0",
+      "source": "./skills/business-tracker",
+      "description": "自动提取、追踪代码库中的业务逻辑，生成活文档",
+      "category": "development",
+      "tags": ["skill"]
+    }
+  ]
+}

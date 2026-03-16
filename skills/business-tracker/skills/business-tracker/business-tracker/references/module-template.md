@@ -10,15 +10,39 @@
   1. Write like a product doc, not a code manual
   2. Cover ALL business logic — every flow, every branch, every constraint
   3. Organize by flows and rules, not by class names or method signatures
-  4. Code locations: only top-level entry points, not every file
-  5. Uncertain rules get [speculative] tag
+  4. Uncertain rules get [speculative] tag
+  5. Cross-module references use @biz_scan/modules/xxx.md format
+  6. Core Classes table is MANDATORY — it's the bridge between docs and code
+  7. File coverage is tracked in .scan-cache.json, NOT in this md file
 
   Auto-split rule:
   - When this file exceeds 150 lines, split by business topic into sub-files
   - This file becomes a module index (overview + sub-file reference list)
   - Sub-files go in biz_scan/modules/<module_name>/
   - Each sub-file covers one business topic, using the "Sub-file template" below
+  - Core Classes section STAYS in the index file (not split)
 -->
+
+## Core Classes
+
+<!--
+  MANDATORY section. Maps business concepts to actual code locations.
+  Purpose: enable code navigation and help developers know where to START reading.
+
+  Rules:
+  - Include every class/type that implements business logic in this module
+  - Include classes from sub-libraries that belong to this module's domain
+  - "Role" is a 5-10 word description of what the class DOES, not what it IS
+  - Keep sorted by layer (business → data → model → util)
+  - Mark the 1-3 most important entry classes with ★ — these are where a developer should start reading
+-->
+
+| Class | File | Role |
+|-------|------|------|
+| ★ [MainEntryClass] | [path/to/file.ext] | [What this class does — START HERE] |
+| [ClassName] | [path/to/file.ext] | [What this class does in 5-10 words] |
+
+---
 
 ## Core Flows
 
@@ -32,6 +56,10 @@
   - Every if/else branch must be visible
   - Business conditions must be explicit
   - Data passing between steps: describe WHAT passes, not WHICH variable
+
+  Cross-module references:
+  - When a flow triggers logic in another module, use @biz_scan/modules/xxx.md
+  - Example: "Triggers wallet refresh — see @biz_scan/modules/wallet.md"
 -->
 
 ### Flow 1: [Flow Name]
@@ -76,10 +104,10 @@
 <!--
   How data moves, where it lives, how it syncs.
   Don't list fields — but do describe:
-  - Storage mechanism (e.g. Sembast, SQLite, SharedPreferences)
+  - Storage mechanism (e.g. SQLite, Redis, SharedPreferences, localStorage)
   - Data lifecycle (when written, when cleared)
   - Relationships between data copies (local model vs API model vs UI model)
-  - Data isolation strategy (e.g. per-user)
+  - Data isolation strategy (e.g. per-user, per-tenant)
 -->
 
 - [Data storage description]
@@ -105,10 +133,12 @@
   How this module works with other modules.
   This is one of the hardest things to read from code — scattered across many files.
   Be specific about interaction scenarios and data flow direction.
+
+  MUST use @biz_scan/modules/xxx.md references for every mentioned module.
 -->
 
-- **With [Module X]**: [Interaction pattern and scenario]
-- **With [Module Y]**: [Interaction pattern and scenario]
+- **With [Module X]** (@biz_scan/modules/x.md): [Interaction pattern and scenario]
+- **With [Module Y]** (@biz_scan/modules/y.md): [Interaction pattern and scenario]
 
 ---
 
@@ -123,17 +153,12 @@
 
 ---
 
-## Code Entry Points
-
 <!--
-  Only the top-level entry files (3-5). Not every implementation file.
-  Purpose: help people know where to START reading code, not replace code reading.
+  File coverage tracking:
+  Which files belong to this module and their scan status are tracked in
+  biz_scan/.scan-cache.json (under each file's "module" field), NOT in this md file.
+  This keeps the md focused on business logic only.
 -->
-
-- [Role description]: `path/to/entry.dart`
-
----
----
 
 # ===== Templates for split-file scenario =====
 
@@ -155,22 +180,30 @@
 
 | Topic | Description | Details |
 |-------|-------------|---------|
-| Sync | Bookshelf data incremental sync flow | @biz_scan/modules/bookshelf/sync.md |
-| Auto-pull | Auto-return to reader on app exit | @biz_scan/modules/bookshelf/auto-pull.md |
-| Offline download | Chapter content download and storage | @biz_scan/modules/bookshelf/download.md |
-| Purchased | Unlocked content display and navigation | @biz_scan/modules/bookshelf/purchased.md |
+| Sync | Data incremental sync flow | @biz_scan/modules/module_name/sync.md |
+| Purchase | In-app purchase and unlock | @biz_scan/modules/module_name/purchase.md |
+| Settings | User preferences and config | @biz_scan/modules/module_name/settings.md |
+
+## Core Classes
+
+[STAYS in index — not split into sub-files. Mark 1-3 entry classes with ★]
+
+| Class | File | Role |
+|-------|------|------|
+| ★ ... | ... | ... (START HERE) |
+| ... | ... | ... |
 
 ## Cross-Module Interactions
 
-[Stays in index — this is module-level info]
+[STAYS in index — this is module-level info]
+
+- **With [Module X]** (@biz_scan/modules/x.md): ...
 
 ## Current Special States
 
-[Stays in index]
+[STAYS in index]
 
-## Code Entry Points
-
-[Stays in index]
+  (File coverage tracked in .scan-cache.json, not in md)
 -->
 
 ## Sub-file Template
@@ -178,7 +211,7 @@
 <!--
 # [Module Name] — [Sub-topic Name]
 
-> Parent module: [Module Name]
+> Parent module: @biz_scan/modules/module_name.md (or /index.md)
 > Last updated: [date]
 
 ---

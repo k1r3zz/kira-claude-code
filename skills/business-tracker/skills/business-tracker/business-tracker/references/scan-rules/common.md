@@ -120,14 +120,19 @@ After writing a module's docs, verify:
 - File coverage is tracked in `.scan-cache.json`, NOT in the md file
 - A module's doc should read like a **product PRD's technical supplement**, not an API reference
 
-### Auto-Split
+### Extraction Completeness
 
-When a single module file exceeds **150 lines**, split by business topic:
-- Module file becomes an index (overview + sub-file reference table)
-- Sub-files go in `biz_scan/modules/<module_name>/` directory
-- Each sub-file covers one business topic
-- Core Classes table stays in the index file
-- See `module-template.md` for the split template
+The goal is **complete extraction** — every business flow, every branch, every constraint that exists in the code must appear in the docs. There is no fixed "N rules per M lines" quota. Instead, the standard is: if a branch exists in code, it must exist in the doc.
+
+**How to verify completeness:**
+- After extracting from a file, mentally walk through the code's control flow — is every path represented?
+- If a method has 5 if-branches but only 2 were extracted, the extraction is incomplete
+
+**Banned writing patterns (these indicate incomplete extraction):**
+- "handles different cases based on condition" — must list each case explicitly
+- "calls the relevant service to complete the operation" — must name the service and what it does
+- "performs various validations" — must list each validation
+- Any use of vague qualifiers ("various", "relevant", "different", "multiple") that obscure specific branches — replace with the actual list of items
 
 ---
 
@@ -173,6 +178,12 @@ A single context window can't hold all code from large projects. Batching ensure
 - Include a module's business logic files AND their direct data-layer dependencies in the same batch
 - In monorepos / multi-package projects, process each sub-project separately
 - Sub-libraries: each sub-lib gets its own batch(es)
+
+**Parallel execution constraints:**
+- Maximum 2 scan agents running concurrently
+- The main agent acts as dispatcher only — does NOT read source files or extract logic itself
+- Each scan agent independently: reads files → extracts logic → writes module .md → updates .scan-cache.json
+- Agents must NOT pass scan results to each other (prevents double-compression / detail loss)
 
 ### Batch Order
 ```

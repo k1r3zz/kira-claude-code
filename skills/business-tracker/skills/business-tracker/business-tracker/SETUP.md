@@ -4,11 +4,13 @@ Works with any tech stack (Flutter, Node.js, Go, Python, Java, .NET, Rust, Ruby,
 
 ## Install
 
-```bash
-cp -r business-tracker .claude/skills/
+In Claude Code, run:
 ```
+/plugin
+```
+Then select `business-tracker` from the plugin list to install.
 
-Then run `/business-tracker biz scan` in Claude Code. The first scan auto-detects your project type and creates the `biz_scan/` directory.
+After installation, run `/business-tracker biz scan` in your project. The first scan auto-detects your project type and creates the `biz_scan/` directory.
 
 ## Team Members
 

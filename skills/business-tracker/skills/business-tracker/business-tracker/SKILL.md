@@ -1,7 +1,7 @@
 ---
 name: business-tracker
-version: 1.0.0
-description: "Auto-extract business logic from any codebase into living documentation. Scans code to discover business rules, tracks changes across sessions, and maintains always-up-to-date rule docs organized by module. Supports Flutter, Node.js, Go, Python, Java, .NET, Rust, Ruby, PHP, iOS. Triggers: 'biz scan', 'scan business logic', 'biz update', 'record business change', 'biz query', 'query business rules', 'what are the business rules', 'document business logic'. Use this skill whenever the user wants to understand, extract, document, or track business rules and domain logic in a codebase — even if they don't use the exact command names."
+version: 1.0.3
+description: "Auto-extract business logic from any codebase into living documentation. Scans code to discover business rules, tracks changes across sessions, and maintains always-up-to-date rule docs organized by module. Supports Flutter, Node.js, Go, Python, Java, .NET, Rust, Ruby, PHP, iOS. Triggers: 'biz scan', 'biz-scan', 'scan business logic', 'biz update', 'record business change', 'biz query', 'document business logic'. Use this skill when the user explicitly wants to scan, extract, document, or track business rules in a codebase. Do NOT trigger for general code questions, debugging, or feature development — only when the user's intent is specifically about business logic documentation."
 ---
 
 # Business Tracker
@@ -59,6 +59,7 @@ Commit everything to Git for team sharing.
 7. **Mark uncertainty** — Uncertain rules get a `[speculative]` tag. Encourage human confirmation.
 8. **Transparent coverage** — After scanning, report exactly what was scanned, skipped, and remaining.
 9. **Human-AI collaboration** — Auto-generate the first draft; encourage manual edits and additions.
+10. **Match user's language** — All generated documentation (index.md, module files, changelog, coverage report, progress output) MUST be written in the same language the user used to invoke the command. If the user writes in Chinese, all docs are in Chinese. If in English, all docs are in English. Code identifiers (class names, file paths, variable names) always stay in their original form.
 
 ## Supported Stacks
 
@@ -76,5 +77,7 @@ The skill auto-detects project type and loads only the relevant scan rules:
 | `references/scan-rules/common.md` | Project type detection, business signal patterns, batching strategy, cache format | biz-scan and biz-update |
 | `references/scan-rules/<stack>.md` | Stack-specific file priority rules (e.g., `flutter.md`, `node.md`) | After detecting project type |
 | `references/index-template.md` | Template for index.md | First-time doc generation |
-| `references/module-template.md` | Template for module files | Creating new module files |
+| `references/module-template.md` | Template for module files (single-file format) | Creating new module files |
+| `references/module-index-template.md` | Template for split module index | When module exceeds 150 lines and needs splitting |
+| `references/module-subfile-template.md` | Template for split module sub-topic files | Creating sub-topic files under split modules |
 | `references/changelog-template.md` | Template for changelog entries | biz-update |

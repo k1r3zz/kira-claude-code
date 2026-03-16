@@ -239,6 +239,13 @@ Scan plan:
 
 ## Step 4: Batched Scan Loop
 
+### Execution Constraints
+
+Follow `common.md` Section 5 "Batching Strategy" → "Parallel execution constraints" strictly. Key points:
+- Maximum 2 scan agents concurrently, main agent is dispatcher only
+- Each agent independently handles: read files → extract logic → write module .md → update cache
+- No intermediate transcription between agents
+
 ### Batch ordering: follow the layer structure
 
 Instead of sorting by filename pattern, batch by **module vertical slices**:
@@ -262,40 +269,63 @@ This ensures the scanner sees the complete context for each module in one batch.
 
 Max **8-10 files per batch** (adjust by file size). If a module's vertical slice exceeds this, split into sub-batches but keep related files together.
 
+### Dispatch flow
+
+```
+queue = [module1, module2, module3, ...]
+running = []
+
+while queue not empty:
+  while len(running) < 2 and queue not empty:
+    module = queue.pop(0)
+    agent = launch_scan_agent(module)
+    running.append(agent)
+  wait_for_any(running)  // any agent completes
+  running.remove(completed_agent)
+  // completed agent has already written module .md + cache
+```
+
 ### Each batch:
 
 **4a. Read this batch's source files**
 
 **4b. Extract business logic (product-doc style)**
 
-Follow `common.md` Section 3 "Extraction Principles" strictly:
-
-- **Extract flows**: Chain multiple functions/files into end-to-end business flows with numbered steps
-- **Extract rules**: Identify business constraints, conditions, limits — describe "when X, then Y"
-- **Extract state transitions**: If state machines or lifecycles exist, describe states and triggers
-- **Extract cross-module interactions**: Record module dependencies and data flow
-- **Extract special states**: A/B tests, disabled features, migrating logic
-- **Record code references**: Per `common.md` Section 3 "Code references" — Core Classes table + flow entry point annotations
-- Mark uncertain rules with `[speculative]`
-- **Group by business module**: Determine which module each rule belongs to
+Follow `common.md` Section 3 "Extraction Principles" strictly — including what to extract (flows, rules, state transitions, cross-module interactions, special states, code references), extraction completeness requirements (expand every branch, no summary-style descriptions, no vague qualifiers), and output format. Mark uncertain rules with `[speculative]`. Group extracted rules by business module.
 
 **4c. Write module files (progressive disclosure + auto-split)**
 
-For each affected module:
-- If `biz_scan/modules/<module_name>.md` doesn't exist:
-  Read this skill's `references/module-template.md`, create from template
-- If it exists:
-  Find the relevant section, incrementally update (don't overwrite other sections)
+**Pre-split check (before scanning starts):**
+- If a module has >15 files in `.project-structure.json` OR contains >2 distinct sub-directories (e.g. `user/auth/`, `user/profile/`, `user/settings/`):
+  1. Create `biz_scan/modules/<module_name>/` directory BEFORE scanning begins
+  2. Assign files to sub-topic files based on their sub-directory grouping
+  3. Each batch's agent writes directly to the corresponding sub-topic file
+  4. The main module .md serves as index only: overview + Core Classes + Cross-Module Interactions
+
+For each affected module, check its current state and write accordingly:
+
+**Case 1 — Module not yet created** (`biz_scan/modules/<module_name>.md` doesn't exist):
+- Read this skill's `references/module-template.md`, create from template
+
+**Case 2 — Module exists as single file** (`biz_scan/modules/<module_name>.md` exists):
+- Find the relevant section, incrementally update (don't overwrite other sections)
+
+**Case 3 — Module already split into directory** (`biz_scan/modules/<module_name>/` exists):
+- Read the index file (`<module_name>.md` or `index.md` in the directory) to understand sub-topic structure
+- Write new content to the matching sub-topic file based on the extracted rules' business topic
+- If no matching sub-topic file exists, create a new one from `references/module-subfile-template.md`
+- Only update the index file's Core Classes table and Cross-Module Interactions — do not duplicate content
+
+**All cases:**
 - **MUST include** the `## Core Classes` section (see module-template.md)
 - File coverage is tracked in `.scan-cache.json` (each file's `module` field), NOT in the md file
 
-**Auto-split check** (after each batch write):
+**Auto-split check** (after each batch write, only for Case 2):
 - Check module file line count. If over **150 lines**:
   1. Create `biz_scan/modules/<module_name>/` directory
-  2. Split content into sub-files by business topic
-  3. Replace original module file with index format (overview + sub-file reference table)
+  2. Split content into sub-files by business topic (use `references/module-subfile-template.md`)
+  3. Replace original module file with index format (use `references/module-index-template.md`)
   4. Keep cross-module interactions, special states, and core classes in the index file
-- See `references/module-template.md` for split template
 
 **4d. Update index.md**
 

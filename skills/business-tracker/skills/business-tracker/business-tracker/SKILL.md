@@ -19,11 +19,13 @@ Trigger via `/business-tracker` + natural language. The skill matches user inten
 | "scan business logic", "biz scan", "scan src/services/" | Scan | `commands/biz-scan.md` |
 | "record business change", "biz update", "update business docs" | Track change | `commands/biz-update.md` |
 | "what's the payment rule?", "biz query", "query business rules" | Query | `commands/biz-query.md` |
+| "关联 openspec", "link openspec", "biz link" | Link to OpenSpec | `commands/biz-link-openspec.md` |
 
 **Intent matching:**
 - Contains "scan" → run scan (if a path follows, scope to that path)
 - Contains "record", "update", "change" → track a change
 - Contains "query", "what rule", "how does X work" → query rules
+- Contains "关联", "link" + "openspec" → link biz docs to openspec
 - Ambiguous → ask the user
 
 **On receiving a command:** read the corresponding file under this skill's `commands/` directory and follow its instructions. Scan strategy and detection rules live in `references/` — load them on demand, not upfront.

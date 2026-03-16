@@ -11,6 +11,7 @@ Business logic hides in `if/else` branches, state machines, and scattered servic
 | `biz scan` | Scans your codebase, extracts business rules, and generates structured documentation organized by module |
 | `biz update` | Detects business logic changes in your current session and updates the docs + changelog |
 | `biz query` | Answers questions about your business rules by consulting the generated docs |
+| `关联 openspec` | Links `biz_scan/index.md` as context into `openspec/config.yaml`, so OpenSpec artifacts get business logic context |
 
 ## Before / After
 
